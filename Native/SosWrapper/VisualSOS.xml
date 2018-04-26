@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config>
+	<sendOutputToVSWindow enabled="true" />
+	<extensions>
+		<extension name="ext" path="C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\winext\ext.dll" />
+		<extension name="wow64exts" path="C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\WINXP\wow64exts.dll" />
+		<extension name="exts" path="C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\WINXP\exts.dll" />
+		<extension name="uext" path="C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\winext\uext.dll" />
+		<extension name="ntsdexts" path="C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\WINXP\ntsdexts.dll" />
+	</extensions>
+</config>

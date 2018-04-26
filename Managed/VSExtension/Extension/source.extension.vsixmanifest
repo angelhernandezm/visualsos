@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
+    <Metadata>
+        <Identity Id="VisualSOS.Extension.9c8ec28b-499a-4ce6-9445-e83c3a95b082" Version="1.0" Language="en-US" Publisher="Angel Hernandez" />
+        <DisplayName>VisualSOS.Extension</DisplayName>
+        <Description xml:space="preserve">Visual SOS is both a standalone application (x64) and extension for Visual Studio that exposes functionality in SOS (debugging extension) not available in Visual Studio Debugger.
+
+It comprises the following components:
+
+* Native code library (Visual C++) that leverages debugger engine available in Windows via COM and acts as interface between managed application and debugger (SOS &amp; debu
+</Description>
+        <MoreInfo>http://www.angelhernandezm.com/visual-sos-visual-studio-extension-to-debug-managed-applications-through-sos</MoreInfo>
+        <License>License.txt</License>
+    </Metadata>
+    <Installation>
+        <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[15.0]" />
+    </Installation>
+    <Dependencies>
+        <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,)" />
+        <Dependency Id="Microsoft.VisualStudio.MPF.15.0" DisplayName="Visual Studio MPF 15.0" d:Source="Installed" Version="[15.0]" />
+    </Dependencies>
+    <Prerequisites>
+        <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[15.0,16.0)" DisplayName="Visual Studio core editor" />
+    </Prerequisites>
+    <Assets>
+        <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
+    </Assets>
+</PackageManifest>

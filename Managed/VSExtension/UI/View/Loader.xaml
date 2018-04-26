@@ -1,0 +1,25 @@
+﻿<UserControl x:Class="VisualSOS.UI.View.Loader"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:VisualSOS.UI.View"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+	<UserControl.Resources>
+		<Style x:Key="Background" TargetType="Grid">
+			<Setter Property="Background" Value="#99FFFFFF" />
+		</Style>
+		<Style x:Key="ProgressBar" TargetType="ProgressBar">
+			<Setter Property="IsIndeterminate" Value="True" />
+			<Setter Property="HorizontalAlignment" Value="Center" />
+			<Setter Property="VerticalAlignment" Value="Center" />
+			<Setter Property="Height" Value="26" />
+			<Setter Property="Width" Value="160" />
+		</Style>
+	</UserControl.Resources>
+	<Grid x:Name="LayoutRoot"  
+	      Style="{StaticResource Background}">
+		<ProgressBar Style="{StaticResource ProgressBar}" />
+	</Grid>
+</UserControl>
