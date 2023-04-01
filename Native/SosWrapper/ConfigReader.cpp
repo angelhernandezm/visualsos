@@ -14,6 +14,7 @@ Website           : http://www.angelhernandezm.com
 
 #include "stdafx.h"
 #include "ConfigReader.h"
+#include <Psapi.h>
 
 
 /// <summary>
@@ -49,13 +50,12 @@ void ConfigReader::ExtractInformationFromElement(IXMLDOMNodePtr& node) {
 	DOMNodeType nodeType;
 	WCHAR szNodeText[512] = {0};
 	char szBuffer[MAX_PATH] = {0};
-	
 
 	CoInitialize(nullptr);
 
 	if (SUCCEEDED(node->get_nodeType(&nodeType)) && nodeType == DOMNodeType::NODE_ELEMENT) {
 		nodeContent = SysAllocString(szNodeText);
-		auto pElement = (IXMLDOMElementPtr)node;
+		auto pElement = static_cast<IXMLDOMElementPtr>(node);
 		pElement->get_tagName(&nodeContent);
 
 		if (wcscmp(nodeContent, L"sendOutputToVSWindow") == 0) {
@@ -78,7 +78,7 @@ void ConfigReader::ExtractInformationFromElement(IXMLDOMNodePtr& node) {
 				std::string name(szBuffer);
 				wcstombs_s(&nSize, szBuffer, value.bstrVal, wcslen(value.bstrVal));
 				std::string path(szBuffer);
-				m_extensions.push_back(ExtInformation(name, path));
+				m_extensions.emplace_back(ExtInformation(name, path));
 			}
 				
 		}
@@ -101,7 +101,7 @@ const std::wstring ConfigReader::GetSetting(const wchar_t* key) {
 	if (!Properties.empty() && key != nullptr && wcslen(key) > 0) {
 		typedef std::pair<const std::wstring, const std::wstring> item;
 
-		std::find_if(Properties.begin(), Properties.end(), [&](item i) {
+		std::find_if(Properties.begin(), Properties.end(), [&](const item& i) {
 			auto ret = FALSE;
 
 			if (retval.empty()) {
@@ -191,7 +191,8 @@ std::wstring ConfigReader::DoesConfigFileExist(const HANDLE& hProcess, std::vect
 		if (!found && hModule != nullptr  && (GetModuleFileNameEx(hProcess, hModule, szBuffer, Array_Size(szBuffer))) != NULL) {
 			size_t cntConverted;
 			char szAnsiPath[MAX_PATH];
-			_wsplitpath_s(szBuffer, szDrive, Array_Size(szDrive), szDir, Array_Size(szDir), szFName, Array_Size(szFName), szExt, Array_Size(szExt));
+			_wsplitpath_s(szBuffer, szDrive, Array_Size(szDrive), szDir, Array_Size(szDir),
+						szFName, Array_Size(szFName), szExt, Array_Size(szExt));
 			auto imageName = std::wstring(szFName).append(szExt);
 			auto configPath = std::wstring(szDrive).append(szDir).append(ConfigFileName);
 			wcstombs_s(&cntConverted, szAnsiPath, configPath.data(), configPath.size() );

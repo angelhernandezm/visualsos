@@ -18,6 +18,13 @@ Website           : http://www.angelhernandezm.com
 #include "OutputCallbacks.h"
 #include "EventCallback.h"
 #include "ConfigReader.h"
+#include <combaseapi.h>
+#include <atlbase.h>
+#include <metahost.h>
+#include <mscoree.h>
+#include  "../../dbghelp/inc/dbgeng.h"
+#include <vector>
+#include "Enums.h"
 
 class OutputCallbacks;
 
@@ -26,9 +33,7 @@ class OutputCallbacks;
 /// <summary>
 /// 
 /// </summary>
-
 class SosWrapper_API SosWrapper {
-private:
 	/// <summary>
 	/// The m b is attached
 	/// </summary>
@@ -98,7 +103,6 @@ private:
 	BOOL CheckIfClrIsLoaded(const CComPtr<IEnumUnknown>& pEnumerator);
 
 public:
-
 	/// <summary>
 	/// Initializes a new instance of the <see cref="SosWrapper" /> class.
 	/// </summary>
@@ -155,7 +159,6 @@ public:
 	/// </summary>
 	CComPtr<IDispatch> m_pUnk;
 };
-
 
 #pragma endregion 
 

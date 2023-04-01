@@ -14,6 +14,11 @@ Website           : http://www.angelhernandezm.com
 
 #include "stdafx.h"
 #include "SosWrapper.h"
+#include "Enums.h"
+
+extern "C++" {
+	#include <algorithm>
+}
 
 /// <summary>
 /// The g singleton
@@ -47,11 +52,11 @@ HRESULT SosWrapper::LoadSos() {
 	CComPtr<ICLRRuntimeInfo> pRuntimeInfo;
 
 	if ((hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, GetCurrentProcessId())) != nullptr) {
-		if (SUCCEEDED(CLRCreateInstance(CLSID_CLRMetaHost, IID_ICLRMetaHost, (LPVOID*)&pMetaHost))) {
+		if (SUCCEEDED(CLRCreateInstance(CLSID_CLRMetaHost, IID_ICLRMetaHost, reinterpret_cast<LPVOID*>(&pMetaHost)))) {
 			isLoaded = SUCCEEDED(pMetaHost->EnumerateLoadedRuntimes(hProcess, &pEnumerator)) && CheckIfClrIsLoaded(pEnumerator);
 			// If CLR is not loaded we'll proceed to load and start it
-			if (!isLoaded &&  SUCCEEDED(pMetaHost->GetRuntime(TargetFrameworkVersion, IID_ICLRRuntimeInfo, (LPVOID*)&pRuntimeInfo))) {
-				if (SUCCEEDED(pRuntimeInfo->GetInterface(CLSID_CLRRuntimeHost, IID_ICLRRuntimeHost, (LPVOID*)&m_pRuntimeHost))) {
+			if (!isLoaded && SUCCEEDED(pMetaHost->GetRuntime(TargetFrameworkVersion, IID_ICLRRuntimeInfo, reinterpret_cast<LPVOID*>(&pRuntimeInfo)))) {
+				if (SUCCEEDED(pRuntimeInfo->GetInterface(CLSID_CLRRuntimeHost, IID_ICLRRuntimeHost,  reinterpret_cast<LPVOID*>(&m_pRuntimeHost)))) {
 					retval = RunCommand(ExtPath, TRUE);
 					retval = SUCCEEDED(m_pRuntimeHost->Start()) && SUCCEEDED(RunCommand(LoadSosCommand, TRUE)) ? TRUE : FALSE;
 				}
@@ -80,7 +85,7 @@ BOOL SosWrapper::CheckIfClrIsLoaded(const CComPtr<IEnumUnknown>& pEnumerator) {
 	wchar_t szBuffer[MAX_PATH];
 	CComPtr<ICLRRuntimeInfo> pRuntimeInfo;
 
-	while (SUCCEEDED(pEnumerator->Next(1, (IUnknown **)&pRuntimeInfo, &fetched)) && fetched > 0) {
+	while (SUCCEEDED(pEnumerator->Next(1, reinterpret_cast<IUnknown**>(&pRuntimeInfo), &fetched)) && fetched > 0) {
 		if ((SUCCEEDED(pRuntimeInfo->GetVersionString(szBuffer, &bufferSize))))
 			if (wcscmp(szBuffer, TargetFrameworkVersion) == 0) {
 				retval = TRUE;
@@ -106,10 +111,10 @@ SosWrapper::SosWrapper() {
 SosWrapper::~SosWrapper() {
 	// Unload extensions
 	if (!m_configReader.Extensions_get().empty())
-		std::for_each(m_configReader.Extensions_get().begin(), m_configReader.Extensions_get().end(), [&, this](const ExtInformation& item) {
-		m_pDbgControl->RemoveExtension(item.pHandle);
-	});
-
+		std::for_each(m_configReader.Extensions_get().begin(),
+			m_configReader.Extensions_get().end(), [&, this](const ExtInformation& item) {
+					m_pDbgControl->RemoveExtension(item.pHandle);
+			});
 	m_pDbgClient->EndSession(DEBUG_END_ACTIVE_DETACH);
 }
 
@@ -120,12 +125,13 @@ void SosWrapper::Initialize() {
 	if (!m_bIsInitialized) {
 		CoInitialize(nullptr);
 
-		if (SUCCEEDED(DebugCreate(__uuidof(IDebugClient), (void**)&m_pDbgClient))) {
-			if (SUCCEEDED(m_pDbgClient->QueryInterface(__uuidof(IDebugControl), (void**)&m_pDbgControl))) {
+		if (SUCCEEDED(DebugCreate(__uuidof(IDebugClient), reinterpret_cast<void**>(& m_pDbgClient)))) {
+			if (SUCCEEDED(m_pDbgClient->QueryInterface(__uuidof(IDebugControl), reinterpret_cast<void**>(&m_pDbgControl)))) {
 				// Load extensions
-				std::for_each(m_configReader.Extensions_get().begin(), m_configReader.Extensions_get().end(), [&, this](ExtInformation& item) {
-					m_pDbgControl->AddExtension(item.Path.data(), NULL, &item.pHandle);
-				});
+				std::for_each(m_configReader.Extensions_get().begin(), 
+					m_configReader.Extensions_get().end(), [&, this](ExtInformation& item) {
+							m_pDbgControl->AddExtension(item.Path.data(), NULL, &item.pHandle);
+					});
 
 				m_pUnk.CoCreateInstance(L"VisualSOS.Core.Infrastructure.OutputMarshalling", nullptr);
 				m_pDbgClient->SetOutputCallbacks(&m_pOutputCallback);
@@ -179,7 +185,7 @@ HRESULT SosWrapper::RunCommand(const char* szCommand, BOOL bPrivate) {
 					szCommand, DEBUG_EXECUTE_NOT_LOGGED | DEBUG_EXECUTE_NO_REPEAT);
 			else retval = m_pDbgControl->Execute(DEBUG_OUTCTL_ALL_CLIENTS, szCommand, DEBUG_EXECUTE_NO_REPEAT);
 		}
-		catch (std::exception &ex) {
+		catch (std::exception& ex) {
 			printException(ex);
 		}
 	}
@@ -194,7 +200,6 @@ HRESULT SosWrapper::RunCommand(const char* szCommand, BOOL bPrivate) {
 /// <param name="nProcessId">The n process identifier.</param>
 /// <returns></returns>
 HRESULT SosWrapper::AttachOrDetach(AttachBehavior behavior, ULONG nProcessId) {
-	HRESULT hr;
 	auto retval = S_FALSE;
 
 	// If debugging engine couldn't be initialized it's pointless to try to attach to it so we return
@@ -202,18 +207,18 @@ HRESULT SosWrapper::AttachOrDetach(AttachBehavior behavior, ULONG nProcessId) {
 		return retval;
 
 	switch (behavior) {
-	case AttachBehavior::Attach:
+	case Attach:
 		if (!m_bIsAttached && nProcessId > 0) {
 			if (SUCCEEDED(retval = m_pDbgClient->AttachProcess(NULL, nProcessId, DEBUG_ATTACH_INVASIVE_NO_INITIAL_BREAK))) {
 				if ((m_targetProcess = OpenProcess(PROCESS_ALL_ACCESS, TRUE, nProcessId)) != nullptr && DebugBreakProcess(m_targetProcess)) {
 					m_pDbgControl->WaitForEvent(DEBUG_WAIT_DEFAULT, 3000);
 					m_pDbgControl->SetInterrupt(DEBUG_INTERRUPT_ACTIVE);
-					m_bIsAttached = SUCCEEDED(LoadSos()); 
+					m_bIsAttached = SUCCEEDED(LoadSos());
 				}
 			}
 		}
 		break;
-	case AttachBehavior::Detach:
+	case Detach:
 		if (m_bIsAttached) {
 			retval = m_pDbgClient->DetachProcesses();
 			CloseHandle(m_targetProcess);
@@ -265,7 +270,7 @@ SosWrapper_API HRESULT AttachOrDetach(int attachBehavior, ULONG pid) {
 	HRESULT retval = S_FALSE;
 
 	if (g_Singleton != nullptr) {
-		retval = g_Singleton->AttachOrDetach((AttachBehavior)attachBehavior, pid);
+		retval = g_Singleton->AttachOrDetach(static_cast<AttachBehavior>(attachBehavior), pid);
 	}
 
 	return retval;
@@ -293,15 +298,15 @@ SosWrapper_API HRESULT RunCommand(const char* szCommand, BOOL bPrivate) {
 /// <param name="option">The option.</param>
 /// <returns></returns>
 SosWrapper_API HRESULT ManageDebuggingEngine(UINT option) {
-	if (option == DebuggingEngineOption::Start) {
+	if (option == Start) {
 		if (g_Singleton == nullptr)
 			g_Singleton = new SosWrapper();
 	}
-	else if (option == DebuggingEngineOption::Stop) {
+	else if (option == Stop) {
 		delete g_Singleton;
 	}
 
-	return  S_OK;;
+	return  S_OK;
 }
 
 #pragma endregion 

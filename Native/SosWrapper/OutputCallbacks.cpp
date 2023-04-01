@@ -14,9 +14,11 @@ Website           : http://www.angelhernandezm.com
 
 #include "stdafx.h"
 #include "OutputCallbacks.h"
+#include <atlcomcli.h>
 #include <winnt.h>
 #include <cstdlib>
 #include <debugapi.h>
+#include <process.h>
 #include <winerror.h>
 
 CComPtr<IDispatch> OutputCallbacks::m_pUnk;
@@ -48,7 +50,7 @@ OutputCallbacks::~OutputCallbacks() {
 STDMETHODIMP OutputCallbacks::QueryInterface(__in REFIID InterfaceId, __out PVOID* Interface) {
 	*Interface = nullptr;
 	if (IsEqualIID(InterfaceId, __uuidof(IUnknown)) || IsEqualIID(InterfaceId, __uuidof(IDebugOutputCallbacks))) {
-		*Interface = (IDebugOutputCallbacks *)this;
+		*Interface =  reinterpret_cast<IDebugOutputCallbacks*>(this);
 		InterlockedIncrement(&m_ref);
 		return S_OK;
 	}
@@ -89,7 +91,7 @@ STDMETHODIMP OutputCallbacks::Output(__in ULONG Mask, __in PCSTR Text) {
 	unsigned int id;
 
 	CloseHandle(reinterpret_cast<HANDLE>(_beginthreadex(nullptr, NULL, [](void* pData) -> unsigned int {
-		auto text = reinterpret_cast<std::string*>(pData);
+		auto text = static_cast<std::string*>(pData);
 		m_pUnk.Invoke1(_bstr_t("RedirectOutput"), &_variant_t(text->c_str()));
 		delete pData;
 		return 0;
@@ -103,10 +105,10 @@ STDMETHODIMP OutputCallbacks::Output(__in ULONG Mask, __in PCSTR Text) {
 #endif
 
 	if ((Mask & DEBUG_OUTPUT_NORMAL) == DEBUG_OUTPUT_NORMAL) {
-		if (m_pBufferNormal == NULL) {
+		if (m_pBufferNormal == nullptr) {
 			m_nBufferNormal = 0;
-			m_pBufferNormal = (PCHAR)malloc(sizeof(CHAR)*(MAX_OUTPUTCALLBACKS_BUFFER));
-			if (m_pBufferNormal == NULL) return E_OUTOFMEMORY;
+			m_pBufferNormal = static_cast<PCHAR>(malloc(sizeof(CHAR)*(MAX_OUTPUTCALLBACKS_BUFFER)));
+			if (m_pBufferNormal == nullptr) return E_OUTOFMEMORY;
 			m_pBufferNormal[0] = '\0';
 			m_pBufferNormal[MAX_OUTPUTCALLBACKS_LENGTH] = '\0';
 		}
@@ -124,10 +126,10 @@ STDMETHODIMP OutputCallbacks::Output(__in ULONG Mask, __in PCSTR Text) {
 	}
 
 	if ((Mask & DEBUG_OUTPUT_ERROR) == DEBUG_OUTPUT_ERROR) {
-		if (m_pBufferError == NULL) {
+		if (m_pBufferError == nullptr) {
 			m_nBufferError = 0;
-			m_pBufferError = (PCHAR)malloc(sizeof(CHAR)*(MAX_OUTPUTCALLBACKS_BUFFER));
-			if (m_pBufferError == NULL) return E_OUTOFMEMORY;
+			m_pBufferError = static_cast<PCHAR>(malloc(sizeof(CHAR) * (MAX_OUTPUTCALLBACKS_BUFFER)));
+			if (m_pBufferError == nullptr) return E_OUTOFMEMORY;
 			m_pBufferError[0] = '\0';
 			m_pBufferError[MAX_OUTPUTCALLBACKS_LENGTH] = '\0';
 		}
@@ -144,8 +146,6 @@ STDMETHODIMP OutputCallbacks::Output(__in ULONG Mask, __in PCSTR Text) {
 			m_pBufferError[m_nBufferError] = '\0';
 		}
 	}
-
-
 
 	return S_OK;
 }

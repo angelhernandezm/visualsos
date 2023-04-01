@@ -12,6 +12,7 @@
 			 x:Name="MainContainer"     
 			 d:DesignHeight="300" d:DesignWidth="300"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              DataContext="{DynamicResource CombinedViewModel}">
     <Window.Resources>
         <ResourceDictionary>
@@ -219,11 +220,11 @@
             <TabItem Header="Output">
                 <ScrollViewer>
                     <TextBox Name="TxtOutput" Text="{Binding ManagedAppsVm.OutPut}" IsReadOnly="True" FontFamily="Courier, Consolas">
-                        <i:Interaction.Triggers>
-                            <i:EventTrigger EventName="TextChanged">
-                                <i:InvokeCommandAction  Command="{Binding Path=AutoScrollOutputCommand}" CommandParameter="{Binding ElementName=TxtOutput}" />
-                            </i:EventTrigger>
-                        </i:Interaction.Triggers>
+                        <b:Interaction.Triggers>
+                            <b:EventTrigger EventName="TextChanged">
+                                <b:InvokeCommandAction  Command="{Binding Path=AutoScrollOutputCommand}" CommandParameter="{Binding ElementName=TxtOutput}" />
+                            </b:EventTrigger>
+                        </b:Interaction.Triggers>
                         <TextBox.ContextMenu>
                             <ContextMenu>
                                 <MenuItem Header="Clear..." Command="{Binding Source={StaticResource Proxy}, Path=Data.ManagedAppsVm.ClearOutputCommand}"/>

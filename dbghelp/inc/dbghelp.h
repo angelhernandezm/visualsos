@@ -45,7 +45,7 @@ Revision History:
 
 
 #ifdef __cplusplus
-extern "C" {
+//extern "C" {
 #endif
 
 #ifdef _IMAGEHLP_SOURCE_

@@ -12,6 +12,8 @@ e-m@il            : me@angelhernandezm.com
 Website           : http://www.angelhernandezm.com
 */
 
+#pragma once 
+
 #include "stdafx.h"
 #include  "../../dbghelp/inc/dbgeng.h"
 
@@ -19,8 +21,7 @@ Website           : http://www.angelhernandezm.com
 /// 
 /// </summary>
 /// <seealso cref="IDebugEventCallbacks" />
-class EventCallback : public IDebugEventCallbacks {		 
-private:
+class EventCallback : public IDebugEventCallbacks {
 	/// <summary>
 	/// The m reference
 	/// </summary>

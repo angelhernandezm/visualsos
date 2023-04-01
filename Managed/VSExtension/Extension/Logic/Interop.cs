@@ -83,12 +83,12 @@ namespace VisualSOS.Extension.Logic {
         /// <summary>
         /// The visual sos window style
         /// </summary>
-        public const uint VisualSosWindowStyle = 0x96CD0000;
+        public const uint VisualSosWindowStyle = 0x96CF0000; //0x96CD0000;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public enum CmdShow : int {
+		/// <summary>
+		/// 
+		/// </summary>
+		public enum CmdShow : int {
             SW_HIDE = 0,
             SW_MAXIMIZE = 3,
             SW_RESTORE = 9

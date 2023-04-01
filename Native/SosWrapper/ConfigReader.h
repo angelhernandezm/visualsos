@@ -12,21 +12,21 @@ e-m@il            : me@angelhernandezm.com
 Website           : http://www.angelhernandezm.com
 */
 
-#include <iostream>
-#include <memory.h>
-#include <typeinfo.h>
+#pragma once
+
+#include <fstream>
+//#include <memory.h>
+//#include <typeinfo.h>
 #include <msxml6.h>
 #include <vector>
-#include <exception>
-#include <Psapi.h>
+#include "ExtInformation.h"
 #include <map>
-#import "msxml6.dll"
+#import "c:\windows\system32\msxml6.dll"
 
 /// <summary>
 /// 
 /// </summary>
 class ConfigReader {
-private:
 	/// <summary>
 	/// Gets the thread token.
 	/// </summary>
@@ -78,7 +78,7 @@ private:
 	BOOL SetPrivilege(HANDLE& hToken, LPCTSTR Privilege, BOOL bEnablePrivilege);
 
 	/// <summary>
-	/// Doeses the configuration file exist.
+	/// Checks whether the configuration file exist.
 	/// </summary>
 	/// <param name="hProcess">The h process.</param>
 	/// <param name="hModules">The h modules.</param>
@@ -111,7 +111,7 @@ public:
 	const std::wstring GetSetting(const wchar_t* key);
 
 	/// <summary>
-	/// Extensionses the get.
+	/// Gets loaded extensions
 	/// </summary>
 	/// <returns></returns>
 	std::vector<ExtInformation>& Extensions_get();

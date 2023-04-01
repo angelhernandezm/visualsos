@@ -14,6 +14,7 @@ Website           : http://www.angelhernandezm.com
 
 #pragma once
 
+#include <atlcomcli.h>
 #include  "../../dbghelp/inc/dbgeng.h"
 
 #define MAX_OUTPUTCALLBACKS_BUFFER 0x1000000  // 1Mb

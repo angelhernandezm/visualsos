@@ -20,7 +20,6 @@ Website           : http://www.angelhernandezm.com
 /// </summary>
 EventCallback::EventCallback() {
 	m_ref = 1;
-
 }
 
 /// <summary>
@@ -37,7 +36,7 @@ EventCallback::~EventCallback() = default;
 STDMETHODIMP EventCallback::QueryInterface(__in REFIID InterfaceId, __out PVOID* Interface) {
 	*Interface = nullptr;
 	if (IsEqualIID(InterfaceId, __uuidof(IUnknown)) || IsEqualIID(InterfaceId, __uuidof(IDebugEventCallbacks))) {
-		*Interface = (IDebugEventCallbacks *)this;
+		*Interface = reinterpret_cast<IDebugEventCallbacks*>(this);
 		InterlockedIncrement(&m_ref);
 		return S_OK;
 	} else {

@@ -55,21 +55,23 @@ namespace VisualSOS.Core.Infrastructure
             }
         }
 
-        /// <summary>
-        /// Redirects the output.
-        /// </summary>
-        /// <param name="message">The message.</param>
-        /// <exception cref="NotImplementedException"></exception>
-        public void RedirectOutput(string message) {
-            if (!string.IsNullOrEmpty(message))
-                (new Thread(() => m_outputMessageFunctor?.Invoke(message))).Start();
-        }
+		/// <summary>
+		/// Redirects the output.
+		/// </summary>
+		/// <param name="message">The message.</param>
+		/// <exception cref="NotImplementedException"></exception>
+		public void RedirectOutput(string message) {
+			if (!string.IsNullOrEmpty(message)) {
+				Thread newThread = new Thread(() => m_outputMessageFunctor?.Invoke(message));
+				newThread.Start();
+			}
+		}
 
-        /// <summary>
-        /// Pins the functor.
-        /// </summary>
-        /// <param name="action">The action.</param>
-        public void PinFunctor(Action<string> action) {
+		/// <summary>
+		/// Pins the functor.
+		/// </summary>
+		/// <param name="action">The action.</param>
+		public void PinFunctor(Action<string> action) {
             if (action != null) {
                 m_outputMessageFunctor = action;
             } else

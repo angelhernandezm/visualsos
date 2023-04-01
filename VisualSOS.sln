@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2036
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33516.290
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Native", "Native", "{8C852C1D-5F73-4311-9840-ACB82B8615F7}"
 EndProject
@@ -174,39 +174,5 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EDF0A673-31F3-4D18-8AE8-758F0C0C3E81}
-	EndGlobalSection
-	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 8
-		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = https://angeljesus14.visualstudio.com/defaultcollection
-		SccLocalPath0 = .
-		SccProjectUniqueName1 = Managed\\Sample\u0020App\\Sample\u0020App.csproj
-		SccProjectTopLevelParentUniqueName1 = VisualSOS.sln
-		SccProjectName1 = Managed/Sample\u0020App
-		SccLocalPath1 = Managed\\Sample\u0020App
-		SccProjectUniqueName2 = Managed\\VSExtension\\Abstractions\\VisualSOS.Abstractions.csproj
-		SccProjectTopLevelParentUniqueName2 = VisualSOS.sln
-		SccProjectName2 = Managed/VSExtension/Abstractions
-		SccLocalPath2 = Managed\\VSExtension\\Abstractions
-		SccProjectUniqueName3 = Managed\\VSExtension\\Common\\VisualSOS.Common.csproj
-		SccProjectTopLevelParentUniqueName3 = VisualSOS.sln
-		SccProjectName3 = Managed/VSExtension/Common
-		SccLocalPath3 = Managed\\VSExtension\\Common
-		SccProjectUniqueName4 = Managed\\VSExtension\\Core\\VisualSOS.Core.csproj
-		SccProjectTopLevelParentUniqueName4 = VisualSOS.sln
-		SccProjectName4 = Managed/VSExtension/Core
-		SccLocalPath4 = Managed\\VSExtension\\Core
-		SccProjectUniqueName5 = Managed\\VSExtension\\Extension\\VisualSOS.Extension.csproj
-		SccProjectTopLevelParentUniqueName5 = VisualSOS.sln
-		SccProjectName5 = Managed/VSExtension/Extension
-		SccLocalPath5 = Managed\\VSExtension\\Extension
-		SccProjectUniqueName6 = Managed\\VSExtension\\UI\\VisualSOS.UI.csproj
-		SccProjectTopLevelParentUniqueName6 = VisualSOS.sln
-		SccProjectName6 = Managed/VSExtension/UI
-		SccLocalPath6 = Managed\\VSExtension\\UI
-		SccProjectUniqueName7 = Native\\SosWrapper\\SosWrapper.vcxproj
-		SccProjectTopLevelParentUniqueName7 = VisualSOS.sln
-		SccProjectName7 = Native/SosWrapper
-		SccLocalPath7 = Native\\SosWrapper
 	EndGlobalSection
 EndGlobal
