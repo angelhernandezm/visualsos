@@ -132,5 +132,59 @@ namespace VisualSOS.Common {
 					(object)root.Value
 			);
 		}
+
+		/// <summary>
+		/// Safely runs callback returning handled exception
+		/// </summary>
+		/// <param name="caller">The caller.</param>
+		/// <param name="callback">The callback.</param>
+		/// <param name="thrown">The thrown.</param>
+		public static bool SafelyRunCallback(this object caller, Action callback, out Exception thrown) {
+			thrown = null;
+			var retval = true;
+
+			try {
+				callback?.Invoke();
+			} catch (Exception e) {
+				thrown = e;
+				retval = false;
+			}
+
+			return retval;
+		}
+
+		/// <summary>
+		/// Safelies the run callback.
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="caller">The caller.</param>
+		/// <param name="callback">The callback.</param>
+		/// <param name="thrown">The thrown.</param>
+		/// <returns></returns>
+		public static T SafelyRunCallback<T>(this object caller, Func<T> callback, out Exception thrown) where T : class {
+			thrown = null;
+			var retval = default(T);
+
+			try {
+				retval = callback?.Invoke();
+			} catch (Exception e) {
+				thrown = e;
+			}
+			return retval;
+		}
+
+
+		/// <summary>
+		/// Safely runs callback.
+		/// </summary>
+		/// <param name="caller">The caller.</param>
+		/// <param name="callback">The callback.</param>
+		public static void SafelyRunCallback(this object caller, Action callback) {
+			try {
+				callback?.Invoke();
+			} catch {
+				// Silently catch exception
+			}
+		}
 	}
 }

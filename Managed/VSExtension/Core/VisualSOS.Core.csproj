@@ -77,6 +77,7 @@
     <Compile Include="Infrastructure\Bootstrapper.cs" />
     <Compile Include="Infrastructure\OutputMarshalling.cs" />
     <Compile Include="Infrastructure\TypeRegistration.cs" />
+    <Compile Include="Model\DebuggerStatus.cs" />
     <Compile Include="Model\ManagedApp.cs" />
     <Compile Include="Model\ProcessQuery.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

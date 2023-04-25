@@ -97,13 +97,22 @@ namespace VisualSOS.UI.ViewModel {
             get; set;
         }
 
-        /// <summary>
-        /// Gets a value indicating whether this instance can attach.
-        /// </summary>
-        /// <value>
-        ///   <c>true</c> if this instance can attach; otherwise, <c>false</c>.
-        /// </value>
-        public bool CanAttach => IsInitialized && !ManagedAppsVm.Repository.SosManager.IsCurrentlyAttached;
+		/// <summary>
+		/// Gets or sets the status.
+		/// </summary>
+		/// <value>The status.</value>
+		public DebuggerStatus Status {
+			get;
+			set;
+		}
+
+		/// <summary>
+		/// Gets a value indicating whether this instance can attach.
+		/// </summary>
+		/// <value>
+		///   <c>true</c> if this instance can attach; otherwise, <c>false</c>.
+		/// </value>
+		public bool CanAttach => IsInitialized && !ManagedAppsVm.Repository.SosManager.IsCurrentlyAttached;
 
         /// <summary>
         /// Gets a value indicating whether this instance is initialized.
@@ -121,28 +130,30 @@ namespace VisualSOS.UI.ViewModel {
         /// </value>
         public bool IsDebugging => IsInitialized && Debuggee != null && ManagedAppsVm.Repository.SosManager.IsCurrentlyAttached;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CombinedViewModel"/> class.
-        /// </summary>
-        public CombinedViewModel() {
-            ManagedAppsVm.Container = this;
-            RunSosCommand = new CommandBase(RunSosCommand_Handler);
-            OutputMarshalling.Current.PinFunctor(UpdateOutputWindow);
-            AttachOrDetachCommand = new CommandBase(AttachOrDetachCommand_Handler);
-            DoubleClickGridCommand = new CommandBase(DoubleClickGridCommand_Handler);
-            AutoScrollOutputCommand = new CommandBase(AutoScrollOutputCommand_Handler);
-            RefreshManagedAppsCommand = new CommandBase(RefreshManagedAppCommand_Handler);
-        }
+		/// <summary>
+		/// Initializes a new instance of the <see cref="CombinedViewModel"/> class.
+		/// </summary>
+		public CombinedViewModel() {
+			Status = new DebuggerStatus();
+			ManagedAppsVm.Container = this;
+			RunSosCommand = new CommandBase(RunSosCommand_Handler);
+			OutputMarshalling.Current.PinFunctor(UpdateOutputWindow);
+			AttachOrDetachCommand = new CommandBase(AttachOrDetachCommand_Handler);
+			DoubleClickGridCommand = new CommandBase(DoubleClickGridCommand_Handler);
+			AutoScrollOutputCommand = new CommandBase(AutoScrollOutputCommand_Handler);
+			RefreshManagedAppsCommand = new CommandBase(RefreshManagedAppCommand_Handler);
+		}
 
-        /// <summary>
-        /// Refreshes the managed application command handler.
-        /// </summary>
-        /// <param name="sender">The sender.</param>
-        private async void RefreshManagedAppCommand_Handler(object sender) {
+		/// <summary>
+		/// Refreshes the managed application command handler.
+		/// </summary>
+		/// <param name="sender">The sender.</param>
+		private async void RefreshManagedAppCommand_Handler(object sender) {
             VisualStateManager.GoToElementState(Instance, "_Loading", true);
             var r = await ManagedAppsVm.Repository.SosManager.GetManagedApps();
             ManagedAppsVm.Data = new ObservableCollection<ManagedApp>((List<ManagedApp>)r.Tag);
             VisualStateManager.GoToElementState(Instance, "_Loaded", true);
+            Dispatcher.CurrentDispatcher.Invoke(() => Status.UpdateValues(ManagedAppsVm.Data.Count, Debuggee));
         }
 
         /// <summary>
@@ -184,7 +195,7 @@ namespace VisualSOS.UI.ViewModel {
         /// <param name="sender">The sender.</param>
         private void AttachOrDetachCommand_Handler(object sender) {
             AttachOrDetachDebuggingEngine((ManagedApp)sender);
-        }
+		}
 
         /// <summary>
         /// Attaches the or detach debugging engine.
@@ -205,7 +216,8 @@ namespace VisualSOS.UI.ViewModel {
                     Debuggee = selected;
                     ManagedAppsVm.Repository.SosManager.AttachOrDetach(DebuggerBehavior.Attach, selected.Pid);
                 }
-            }
+                Dispatcher.CurrentDispatcher.Invoke(() => Status.UpdateValues(ManagedAppsVm.Data.Count, Debuggee));
+			}
         }
 
         /// <summary>

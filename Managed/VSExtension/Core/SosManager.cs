@@ -9,9 +9,11 @@ using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows;
 using VisualSOS.Abstractions;
 using VisualSOS.Abstractions.Logic;
 using VisualSOS.Core.Model;
+using VisualSOS.Common;
 
 namespace VisualSOS.Core {
     public class SosManager : ISosManager, IDisposable {
@@ -156,34 +158,39 @@ namespace VisualSOS.Core {
                 throw new FileNotFoundException(nameof(sosWrapperPath));
         }
 
-        /// <summary>
-        /// Attaches the or detach.
-        /// </summary>
-        /// <param name="behavior">The behavior.</param>
-        /// <param name="pid">The pid.</param>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public ExecutionResult AttachOrDetach(DebuggerBehavior behavior, int pid) {
-            var hProcAddress = IntPtr.Zero;
-            var retval = ExecutionResult.Empty;
+		/// <summary>
+		/// Attaches the or detach.
+		/// </summary>
+		/// <param name="behavior">The behavior.</param>
+		/// <param name="pid">The pid.</param>
+		/// <returns></returns>
+		/// <exception cref="NotImplementedException"></exception>
+		public ExecutionResult AttachOrDetach(DebuggerBehavior behavior, int pid) {
+			Exception ex = null;
+			var hProcAddress = IntPtr.Zero;
+			var retval = ExecutionResult.Empty;
 
-            if (SosWrapperHandle != IntPtr.Zero) {
-                if ((hProcAddress = GetProcAddress(SosWrapperHandle, "AttachOrDetach")) != IntPtr.Zero) {
-                    var functor = Marshal.GetDelegateForFunctionPointer(hProcAddress, typeof(AttachOrDetachDelegate));
-                    retval.IsSuccess = (int)functor.DynamicInvoke((int)behavior, pid) == 0;
-                    var debugeePath = Path.GetDirectoryName(Process.GetProcessById(pid)?.MainModule?.FileName);
-                    LoadSymbols(debugeePath);
-                }
-            }
-            return retval;
-        }
+			if (SosWrapperHandle != IntPtr.Zero) {
+				if (!this.SafelyRunCallback(() => {
+					if ((hProcAddress = GetProcAddress(SosWrapperHandle, "AttachOrDetach")) != IntPtr.Zero) {
+						var functor =
+							Marshal.GetDelegateForFunctionPointer(hProcAddress, typeof(AttachOrDetachDelegate));
+						retval.IsSuccess = (int)functor.DynamicInvoke((int)behavior, pid) == 0;
+						var debugeePath = Path.GetDirectoryName(Process.GetProcessById(pid)?.MainModule?.FileName);
+						LoadSymbols(debugeePath);
+					}
+				}, out ex))
+					MessageBox.Show($"Unable to attach to/detach from selected process. Due to {ex.Message}");
+			}
+			return retval;
+		}
 
-        /// <summary>
-        /// Loads the symbols.
-        /// </summary>
-        /// <param name="debugeePath">The debugee path.</param>
-        /// <returns></returns>
-        public ExecutionResult LoadSymbols(string debugeePath) {
+		/// <summary>
+		/// Loads the symbols.
+		/// </summary>
+		/// <param name="debugeePath">The debugee path.</param>
+		/// <returns></returns>
+		public ExecutionResult LoadSymbols(string debugeePath) {
             var retval = ExecutionResult.Empty;
             var command = $".sympath srv*https://msdl.microsoft.com/download/symbols;{debugeePath}";
             retval.IsSuccess = RunCommand(command, true).IsSuccess && RunCommand(".reload", true).IsSuccess;

@@ -11,229 +11,257 @@
 			 Title="Visual SOS"
 			 x:Name="MainContainer"     
 			 d:DesignHeight="300" d:DesignWidth="300"
-             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              DataContext="{DynamicResource CombinedViewModel}">
-    <Window.Resources>
-        <ResourceDictionary>
-            <vm:CombinedViewModel x:Key="CombinedViewModel" />
-        </ResourceDictionary>
-    </Window.Resources>
-    <Window.InputBindings>
-        <KeyBinding Command="{Binding RefreshManagedAppsCommand}" Key="F6"/>
-        <KeyBinding Command="{Binding AttachOrDetachCommand}" CommandParameter="{Binding ElementName=LstManagedProcesses, Path=SelectedItem}" Key="F9"/>
-    </Window.InputBindings>
-    <VisualStateManager.VisualStateGroups>
-        <VisualStateGroup x:Name="Activity">
-            <VisualState x:Name="_Loaded">
-                <Storyboard>
-                    <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Visibility" Storyboard.TargetName="Loader">
-                        <DiscreteObjectKeyFrame KeyTime="0:0:0.75" Value="{x:Static Visibility.Collapsed}" />
-                    </ObjectAnimationUsingKeyFrames>
-                    <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="Opacity" Storyboard.TargetName="Loader" Duration="0:0:0.75">
-                        <EasingDoubleKeyFrame Value="0" />
-                    </DoubleAnimationUsingKeyFrames>
-                </Storyboard>
-            </VisualState>
-            <VisualState x:Name="_Loading">
-                <Storyboard>
-                    <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Visibility" Storyboard.TargetName="Loader">
-                        <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}" />
-                    </ObjectAnimationUsingKeyFrames>
-                    <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="Opacity" Storyboard.TargetName="Loader" Duration="0:0:0.75">
-                        <EasingDoubleKeyFrame Value="1" />
-                    </DoubleAnimationUsingKeyFrames>
-                </Storyboard>
-            </VisualState>
-        </VisualStateGroup>
-    </VisualStateManager.VisualStateGroups>
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-        <Grid.Resources>
-            <ui:BindingProxy x:Key="Proxy" Data="{Binding}" />
-        </Grid.Resources>
-        <Menu VerticalAlignment="Top" Grid.Row="0">
-            <MenuItem Header="_Refresh" Command="{Binding RefreshManagedAppsCommand}" InputGestureText="F6"/>
-            <MenuItem Header="Commands...">
-                <MenuItem Header="Common Commands...">
-                    <MenuItem Header="Call Stack for All Threads" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
+	<Window.Resources>
+		<ResourceDictionary>
+			<vm:CombinedViewModel x:Key="CombinedViewModel" />
+		</ResourceDictionary>
+	</Window.Resources>
+	<Window.InputBindings>
+		<KeyBinding Command="{Binding RefreshManagedAppsCommand}" Key="F6"/>
+		<KeyBinding Command="{Binding AttachOrDetachCommand}" CommandParameter="{Binding ElementName=LstManagedProcesses, Path=SelectedItem}" Key="F9"/>
+	</Window.InputBindings>
+	<VisualStateManager.VisualStateGroups>
+		<VisualStateGroup x:Name="Activity">
+			<VisualState x:Name="_Loaded">
+				<Storyboard>
+					<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Visibility" Storyboard.TargetName="Loader">
+						<DiscreteObjectKeyFrame KeyTime="0:0:0.75" Value="{x:Static Visibility.Collapsed}" />
+					</ObjectAnimationUsingKeyFrames>
+					<DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="Opacity" Storyboard.TargetName="Loader" Duration="0:0:0.75">
+						<EasingDoubleKeyFrame Value="0" />
+					</DoubleAnimationUsingKeyFrames>
+				</Storyboard>
+			</VisualState>
+			<VisualState x:Name="_Loading">
+				<Storyboard>
+					<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Visibility" Storyboard.TargetName="Loader">
+						<DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}" />
+					</ObjectAnimationUsingKeyFrames>
+					<DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="Opacity" Storyboard.TargetName="Loader" Duration="0:0:0.75">
+						<EasingDoubleKeyFrame Value="1" />
+					</DoubleAnimationUsingKeyFrames>
+				</Storyboard>
+			</VisualState>
+		</VisualStateGroup>
+	</VisualStateManager.VisualStateGroups>
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="*"/>
+		</Grid.RowDefinitions>
+		<Grid.Resources>
+			<ui:BindingProxy x:Key="Proxy" Data="{Binding}" />
+		</Grid.Resources>
+		<Menu VerticalAlignment="Top" Grid.Row="0">
+			<MenuItem Header="_Refresh" Command="{Binding RefreshManagedAppsCommand}" InputGestureText="F6"/>
+			<MenuItem Header="Commands...">
+				<MenuItem Header="Common Commands...">
+					<MenuItem Header="Call Stack for All Threads" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
 													  Path=DataContext.ManagedAppsVm.CallStackForAllThreadsCommand}" CommandParameter="{Binding}" />
-                    <MenuItem Header="View Combined Stack" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
+					<MenuItem Header="View Combined Stack" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
 													  Path=DataContext.ManagedAppsVm.ViewCombinedStackCommand}" CommandParameter="{Binding}" />
-                    <MenuItem Header="View CPU Usage" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
+					<MenuItem Header="View CPU Usage" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
 													  Path=DataContext.ManagedAppsVm.ViewCpuConsumptionCommand}" CommandParameter="{Binding}" />
-                    <MenuItem Header="Show VM Map - VERY SLOW!!!" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
+					<MenuItem Header="Show VM Map - VERY SLOW!!!" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
 													  Path=DataContext.ManagedAppsVm.VmMapCommand}" CommandParameter="{Binding}" />
-                    <MenuItem Header="Show VM Stats" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
+					<MenuItem Header="Show VM Stats" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
 													  Path=DataContext.ManagedAppsVm.VmStatCommand}" CommandParameter="{Binding}" />
-                    <MenuItem Header="Show Memory Summary by Types" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
+					<MenuItem Header="Show Memory Summary by Types" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
 													  Path=DataContext.ManagedAppsVm.ShowMemorySummaryCommand}" CommandParameter="{Binding}" />
-                    <MenuItem Header="Show All Heaps" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
+					<MenuItem Header="Show All Heaps" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
 													  Path=DataContext.ManagedAppsVm.ShowAllHeapsCommand}" CommandParameter="{Binding}" />
-                    <MenuItem Header="Show All Locks" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
+					<MenuItem Header="Show All Locks" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
 													  Path=DataContext.ManagedAppsVm.ShowAllLocksCommand}" CommandParameter="{Binding}" />
-                </MenuItem>
-                <MenuItem Header="Managed Commands...">
-                    <MenuItem Header="View Managed Threads" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
+				</MenuItem>
+				<MenuItem Header="Managed Commands...">
+					<MenuItem Header="View Managed Threads" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
 													  Path=DataContext.ManagedAppsVm.ViewManagedThreadsCommand}" CommandParameter="{Binding}" />
-                    <MenuItem Header="View Managed Call Stack" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
+					<MenuItem Header="View Managed Call Stack" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
 													  Path=DataContext.ManagedAppsVm.ViewManagedCallStackCommand}" CommandParameter="{Binding}" />
-                    <MenuItem Header="Show Most Recent Exception" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
+					<MenuItem Header="Show Most Recent Exception" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
 													  Path=DataContext.ManagedAppsVm.ViewMostRecentExceptionCommand}" CommandParameter="{Binding}" />
-                    <MenuItem Header="Show Local Variables" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
+					<MenuItem Header="Show Local Variables" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
 													  Path=DataContext.ManagedAppsVm.ViewLocalVariablesCommand}" CommandParameter="{Binding}" />
-                    <MenuItem Header="Show Function Call Args" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
+					<MenuItem Header="Show Function Call Args" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
 													  Path=DataContext.ManagedAppsVm.ViewFunctionCallArgsCommand}" CommandParameter="{Binding}" />
-                    <MenuItem Header="Show Memory Use by Type - VERY SLOW!!!" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
+					<MenuItem Header="Show Memory Use by Type - VERY SLOW!!!" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
 													  Path=DataContext.ManagedAppsVm.ViewMemoryConsumptionByTypeCommand}" CommandParameter="{Binding}" />
-                    <MenuItem Header="Show EEVersion" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
+					<MenuItem Header="Show EEVersion" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
 													  Path=DataContext.ManagedAppsVm.ShowEeVersionCommand}" CommandParameter="{Binding}" />
-                    <MenuItem Header="Dump AppDomain(s)" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
+					<MenuItem Header="Dump AppDomain(s)" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
 													  Path=DataContext.ManagedAppsVm.DumpDomainCommand}" CommandParameter="{Binding}" />
-                    <MenuItem Header="View Managed Call Stack - With Method Descriptor" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
+					<MenuItem Header="View Managed Call Stack - With Method Descriptor" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
 													  Path=DataContext.ManagedAppsVm.CallStackWithMethodDescriptorCommand}" CommandParameter="{Binding}" />
-                    <MenuItem Header="Show Finalization Queue" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
+					<MenuItem Header="Show Finalization Queue" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
 													  Path=DataContext.ManagedAppsVm.ShowFinalizeQueueCommand}" CommandParameter="{Binding}" />
-                    <MenuItem Header="View Call Stack (All Threads) - Short" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
+					<MenuItem Header="View Call Stack (All Threads) - Short" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
 													  Path=DataContext.ManagedAppsVm.DumpManagedStackTraceInAllThreadsCommand}" CommandParameter="{Binding}" />
-                    <MenuItem Header="GC Handles Leak" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
+					<MenuItem Header="GC Handles Leak" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
 													  Path=DataContext.ManagedAppsVm.GcHandlesLeakCommand}" CommandParameter="{Binding}" />
-                </MenuItem>
-                <MenuItem Header="Native Commands...">
-                    <MenuItem Header="Analyze..." Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
+				</MenuItem>
+				<MenuItem Header="Native Commands...">
+					<MenuItem Header="Analyze..." Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
 													  Path=DataContext.ManagedAppsVm.AnalyzeExceptionCommand}" CommandParameter="{Binding}" />
-                    <MenuItem Header="List loaded modules" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
+					<MenuItem Header="List loaded modules" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
 													  Path=DataContext.ManagedAppsVm.ListLoadedModulesCommand}" CommandParameter="{Binding}" />
-                    <MenuItem Header="View Native Threads" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
+					<MenuItem Header="View Native Threads" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
 													  Path=DataContext.ManagedAppsVm.ListUnmanagedThreadsCommand}" CommandParameter="{Binding}" />
-                    <MenuItem Header="View Native Stack" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
+					<MenuItem Header="View Native Stack" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
 													  Path=DataContext.ManagedAppsVm.ViewUnManagedStackCommand}" CommandParameter="{Binding}" />
-                </MenuItem>
-            </MenuItem>
-            <MenuItem Header="_Attach/Detach" Command="{Binding AttachOrDetachCommand}" CommandParameter="{Binding ElementName=LstManagedProcesses, Path=SelectedItem}" InputGestureText="F9"/>
-        </Menu>
-        <TabControl HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" Grid.Row="1">
-            <TabItem Header="Workbench" >
-                <StackPanel DataContext="{Binding ManagedAppsVm}" Orientation="Vertical">
-                    <ScrollViewer VerticalAlignment="Stretch" HorizontalAlignment="Stretch" HorizontalScrollBarVisibility="Disabled"  VerticalScrollBarVisibility="Auto">
-                        <ListView Name="LstManagedProcesses" ItemsSource="{Binding Data}"  HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" SelectedItem="{Binding DataFields}">
-                            <ListView.Resources>
-                                <ContextMenu x:Key="ManagedAppContextMenu">
-                                    <MenuItem Header="Common Commands...">
-                                        <MenuItem Header="Call Stack for All Threads" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
+				</MenuItem>
+			</MenuItem>
+			<MenuItem Header="_Attach/Detach" Command="{Binding AttachOrDetachCommand}" CommandParameter="{Binding ElementName=LstManagedProcesses, Path=SelectedItem}" InputGestureText="F9"/>
+		</Menu>
+		<TabControl HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" Grid.Row="1">
+			<TabItem Header="Workbench" >
+				<Grid>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="40*"/>
+						<RowDefinition Height="auto"/>
+						<RowDefinition Height="5*"/>
+					</Grid.RowDefinitions>
+					<ScrollViewer  DataContext="{Binding ManagedAppsVm}" Grid.Row="0" Padding="7">
+						<ListView Name="LstManagedProcesses" ItemsSource="{Binding Data}"  SelectedItem="{Binding DataFields}" d:ItemsSource="{d:SampleData ItemCount=5}">
+							<ListView.Resources>
+								<ContextMenu x:Key="ManagedAppContextMenu">
+									<MenuItem Header="Common Commands...">
+										<MenuItem Header="Call Stack for All Threads" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
 													  Path=DataContext.ManagedAppsVm.CallStackForAllThreadsCommand}" CommandParameter="{Binding}" />
-                                        <MenuItem Header="View Combined Stack" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
+										<MenuItem Header="View Combined Stack" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
 													  Path=DataContext.ManagedAppsVm.ViewCombinedStackCommand}" CommandParameter="{Binding}" />
-                                        <MenuItem Header="View CPU Usage" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
+										<MenuItem Header="View CPU Usage" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
 													  Path=DataContext.ManagedAppsVm.ViewCpuConsumptionCommand}" CommandParameter="{Binding}" />
-                                        <MenuItem Header="Show VM Map - VERY SLOW!!!" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
+										<MenuItem Header="Show VM Map - VERY SLOW!!!" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
 													  Path=DataContext.ManagedAppsVm.VmMapCommand}" CommandParameter="{Binding}" />
-                                        <MenuItem Header="Show VM Stats" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
+										<MenuItem Header="Show VM Stats" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
 													  Path=DataContext.ManagedAppsVm.VmStatCommand}" CommandParameter="{Binding}" />
-                                        <MenuItem Header="Show Memory Summary by Types" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
+										<MenuItem Header="Show Memory Summary by Types" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
 													  Path=DataContext.ManagedAppsVm.ShowMemorySummaryCommand}" CommandParameter="{Binding}" />
-                                        <MenuItem Header="Show All Heaps" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
+										<MenuItem Header="Show All Heaps" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
 													  Path=DataContext.ManagedAppsVm.ShowAllHeapsCommand}" CommandParameter="{Binding}" />
-                                        <MenuItem Header="Show All Locks" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
+										<MenuItem Header="Show All Locks" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
 													  Path=DataContext.ManagedAppsVm.ShowAllLocksCommand}" CommandParameter="{Binding}" />
-                                    </MenuItem>
-                                    <MenuItem Header="Managed Commands...">
-                                        <MenuItem Header="View Managed Threads" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
+									</MenuItem>
+									<MenuItem Header="Managed Commands...">
+										<MenuItem Header="View Managed Threads" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
 													  Path=DataContext.ManagedAppsVm.ViewManagedThreadsCommand}" CommandParameter="{Binding}" />
-                                        <MenuItem Header="View Managed Call Stack" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
+										<MenuItem Header="View Managed Call Stack" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
 													  Path=DataContext.ManagedAppsVm.ViewManagedCallStackCommand}" CommandParameter="{Binding}" />
-                                        <MenuItem Header="Show Most Recent Exception" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
+										<MenuItem Header="Show Most Recent Exception" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
 													  Path=DataContext.ManagedAppsVm.ViewMostRecentExceptionCommand}" CommandParameter="{Binding}" />
-                                        <MenuItem Header="Show Local Variables" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
+										<MenuItem Header="Show Local Variables" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
 													  Path=DataContext.ManagedAppsVm.ViewLocalVariablesCommand}" CommandParameter="{Binding}" />
-                                        <MenuItem Header="Show Function Call Args" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
+										<MenuItem Header="Show Function Call Args" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
 													  Path=DataContext.ManagedAppsVm.ViewFunctionCallArgsCommand}" CommandParameter="{Binding}" />
-                                        <MenuItem Header="Show Memory Use by Type - VERY SLOW!!!" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
+										<MenuItem Header="Show Memory Use by Type - VERY SLOW!!!" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
 													  Path=DataContext.ManagedAppsVm.ViewMemoryConsumptionByTypeCommand}" CommandParameter="{Binding}" />
-                                        <MenuItem Header="Show EEVersion" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
+										<MenuItem Header="Show EEVersion" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
 													  Path=DataContext.ManagedAppsVm.ShowEeVersionCommand}" CommandParameter="{Binding}" />
-                                        <MenuItem Header="Dump AppDomain(s)" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
+										<MenuItem Header="Dump AppDomain(s)" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
 													  Path=DataContext.ManagedAppsVm.DumpDomainCommand}" CommandParameter="{Binding}" />
-                                        <MenuItem Header="View Managed Call Stack - With Method Descriptor" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
+										<MenuItem Header="View Managed Call Stack - With Method Descriptor" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
 													  Path=DataContext.ManagedAppsVm.CallStackWithMethodDescriptorCommand}" CommandParameter="{Binding}" />
-                                        <MenuItem Header="Show Finalization Queue" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
+										<MenuItem Header="Show Finalization Queue" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
 													  Path=DataContext.ManagedAppsVm.ShowFinalizeQueueCommand}" CommandParameter="{Binding}" />
-                                        <MenuItem Header="View Call Stack (All Threads) - Short" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
+										<MenuItem Header="View Call Stack (All Threads) - Short" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
 													  Path=DataContext.ManagedAppsVm.DumpManagedStackTraceInAllThreadsCommand}" CommandParameter="{Binding}" />
-                                        <MenuItem Header="GC Handles Leak" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
+										<MenuItem Header="GC Handles Leak" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
 													  Path=DataContext.ManagedAppsVm.GcHandlesLeakCommand}" CommandParameter="{Binding}" />
-                                    </MenuItem>
-                                    <MenuItem Header="Native Commands...">
-                                        <MenuItem Header="Analyze..." Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
+									</MenuItem>
+									<MenuItem Header="Native Commands...">
+										<MenuItem Header="Analyze..." Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
 													  Path=DataContext.ManagedAppsVm.AnalyzeExceptionCommand}" CommandParameter="{Binding}" />
-                                        <MenuItem Header="List loaded modules" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
+										<MenuItem Header="List loaded modules" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
 													  Path=DataContext.ManagedAppsVm.ListLoadedModulesCommand}" CommandParameter="{Binding}" />
-                                        <MenuItem Header="View Native Threads" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
+										<MenuItem Header="View Native Threads" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
 													  Path=DataContext.ManagedAppsVm.ListUnmanagedThreadsCommand}" CommandParameter="{Binding}" />
-                                        <MenuItem Header="View Native Stack" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
+										<MenuItem Header="View Native Stack" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
 													  Path=DataContext.ManagedAppsVm.ViewUnManagedStackCommand}" CommandParameter="{Binding}" />
-                                    </MenuItem>
-                                </ContextMenu>
-                            </ListView.Resources>
-                            <ListView.Style>
-                                <Style TargetType="{x:Type ListView}">
-                                    <Setter Property="BorderBrush" Value="Black"/>
-                                    <Setter Property="BorderThickness" Value="0"/>
-                                    <Setter Property="Margin" Value="0"/>
-                                    <Style.Resources>
-                                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Black"/>
-                                        <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="Gray"/>
-                                    </Style.Resources>
-                                </Style>
-                            </ListView.Style>
-                            <ListView.ItemContainerStyle>
-                                <Style TargetType="{x:Type ListViewItem}">
-                                    <Setter Property="commandBehaviors:MouseDoubleClick.Command" Value="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window},
+									</MenuItem>
+								</ContextMenu>
+							</ListView.Resources>
+							<ListView.Style>
+								<Style TargetType="{x:Type ListView}">
+									<Setter Property="BorderBrush" Value="Black"/>
+									<Setter Property="BorderThickness" Value="0"/>
+									<Setter Property="Margin" Value="0"/>
+									<Style.Resources>
+										<SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Black"/>
+										<SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="Gray"/>
+									</Style.Resources>
+								</Style>
+							</ListView.Style>
+							<ListView.ItemContainerStyle>
+								<Style TargetType="{x:Type ListViewItem}">
+									<Setter Property="commandBehaviors:MouseDoubleClick.Command" Value="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window},
 																										 Path=DataContext.DoubleClickGridCommand}"/>
-                                    <Setter Property="commandBehaviors:MouseDoubleClick.CommandParameter" Value="{Binding}"/>
-                                    <Setter Property="ContextMenu" Value="{StaticResource ManagedAppContextMenu}" />
-                                </Style>
-                            </ListView.ItemContainerStyle>
-                            <ListView.View>
-                                <GridView>
-                                    <GridViewColumn Header="Process ID" DisplayMemberBinding="{Binding Pid}" />
-                                    <GridViewColumn Header="Process Name" DisplayMemberBinding="{Binding ImageName}" />
-                                    <GridViewColumn Header="Executable" DisplayMemberBinding="{Binding ImagePath}" />
-                                </GridView>
-                            </ListView.View>
-                        </ListView>
-                    </ScrollViewer>
-                    <view:Loader x:Name="Loader" Visibility="Collapsed" Opacity="0" />
-                    <StackPanel Orientation="Horizontal" >
-                        <ScrollViewer Height="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type StackPanel}}, Path=Height}">
-                            <TextBox Width="200" Height="75" Text="{Binding Command}"/>
-                        </ScrollViewer>
-                        <Button Content="Run Command" CommandParameter="{Binding Command}"
+									<Setter Property="commandBehaviors:MouseDoubleClick.CommandParameter" Value="{Binding}"/>
+									<Setter Property="ContextMenu" Value="{StaticResource ManagedAppContextMenu}" />
+								</Style>
+							</ListView.ItemContainerStyle>
+							<ListView.View>
+								<GridView>
+									<GridViewColumn Header="Process ID" DisplayMemberBinding="{Binding Pid}" />
+									<GridViewColumn Header="Process Name" DisplayMemberBinding="{Binding ImageName}" />
+									<GridViewColumn Header="Executable" DisplayMemberBinding="{Binding ImagePath}" />
+								</GridView>
+							</ListView.View>
+						</ListView>
+					</ScrollViewer>
+					<StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Right" Margin="10, 25, 10, 10">
+						<ScrollViewer Height="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type StackPanel}}, Path=Height}">
+							<TextBox Width="400" Height="150" Text="{Binding Command}" TextWrapping="Wrap" AcceptsReturn="True"/>
+						</ScrollViewer>
+						<Button Content="Run Command" CommandParameter="{Binding Command}" Width="150" Height="50"
 													  Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
-													  Path=DataContext.RunSosCommand}"/>
-                    </StackPanel>
-                </StackPanel>
-            </TabItem>
-            <TabItem Header="Output">
-                <ScrollViewer>
-                    <TextBox Name="TxtOutput" Text="{Binding ManagedAppsVm.OutPut}" IsReadOnly="True" FontFamily="Courier, Consolas">
-                        <b:Interaction.Triggers>
-                            <b:EventTrigger EventName="TextChanged">
-                                <b:InvokeCommandAction  Command="{Binding Path=AutoScrollOutputCommand}" CommandParameter="{Binding ElementName=TxtOutput}" />
-                            </b:EventTrigger>
-                        </b:Interaction.Triggers>
-                        <TextBox.ContextMenu>
-                            <ContextMenu>
-                                <MenuItem Header="Clear..." Command="{Binding Source={StaticResource Proxy}, Path=Data.ManagedAppsVm.ClearOutputCommand}"/>
-                                <MenuItem Header="Save Output..." Command="{Binding Source={StaticResource Proxy}, Path=Data.ManagedAppsVm.SaveOutputCommand}" />
-                            </ContextMenu>
-                        </TextBox.ContextMenu>
-                    </TextBox>
-                </ScrollViewer>
-            </TabItem>
-        </TabControl>
-    </Grid>
+													  Path=DataContext.RunSosCommand}" Margin="10, 10, 10, 10"/>
+					</StackPanel>
+					<StatusBar Grid.Row="2" Height="35" Margin="0, 10, 0, -20">
+						<StatusBar.ItemsPanel>
+							<ItemsPanelTemplate>
+								<Grid>
+									<Grid.RowDefinitions>
+										<RowDefinition Height="*"/>
+									</Grid.RowDefinitions>
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition Width="300"/>
+										<ColumnDefinition Width="auto"/>
+										<ColumnDefinition Width="auto"/>
+									</Grid.ColumnDefinitions>
+								</Grid>
+							</ItemsPanelTemplate>
+						</StatusBar.ItemsPanel>
+						<StatusBarItem Grid.Column="0">
+							<Label Name="lblAppUsingClr" Content="{Binding ManagedAppsVm.Container.Status.AppsUsingClr}" FontFamily="Courier, Consolas"/>
+						</StatusBarItem>
+						<StatusBarItem Grid.Column="1" HorizontalAlignment="Right">
+							<view:Loader x:Name="Loader" Visibility="Collapsed" Opacity="0"  />
+						</StatusBarItem>
+						<StatusBarItem Grid.Column="2" HorizontalAlignment="Right">
+							<Label Name="lblDebuggerState" Content="{Binding ManagedAppsVm.Container.Status.DebuggerState}"  FontFamily="Courier, Consolas"/>
+						</StatusBarItem>
+					</StatusBar>
+				</Grid>
+			</TabItem>
+			<TabItem Header="Output">
+				<ScrollViewer>
+					<TextBox Name="TxtOutput" Text="{Binding ManagedAppsVm.OutPut}" IsReadOnly="True" FontFamily="Courier, Consolas">
+						<b:Interaction.Triggers>
+							<b:EventTrigger EventName="TextChanged">
+								<b:InvokeCommandAction  Command="{Binding Path=AutoScrollOutputCommand}" CommandParameter="{Binding ElementName=TxtOutput}" />
+							</b:EventTrigger>
+						</b:Interaction.Triggers>
+						<TextBox.ContextMenu>
+							<ContextMenu>
+								<MenuItem Header="Clear..." Command="{Binding Source={StaticResource Proxy}, Path=Data.ManagedAppsVm.ClearOutputCommand}"/>
+								<MenuItem Header="Save Output..." Command="{Binding Source={StaticResource Proxy}, Path=Data.ManagedAppsVm.SaveOutputCommand}" />
+							</ContextMenu>
+						</TextBox.ContextMenu>
+					</TextBox>
+				</ScrollViewer>
+			</TabItem>
+		</TabControl>
+	</Grid>
 </Window>
