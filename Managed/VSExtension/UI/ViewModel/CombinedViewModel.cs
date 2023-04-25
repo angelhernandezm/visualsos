@@ -197,35 +197,39 @@ namespace VisualSOS.UI.ViewModel {
             AttachOrDetachDebuggingEngine((ManagedApp)sender);
 		}
 
-        /// <summary>
-        /// Attaches the or detach debugging engine.
-        /// </summary>
-        /// <param name="selected">The selected.</param>
-        private void AttachOrDetachDebuggingEngine(ManagedApp selected) {
-            if (IsInitialized && selected != null) {
-                if (selected.Pid == Debuggee?.Pid) {
-                    if (MessageBox.Show($"{selected.ImageName} (Pid:{selected.Pid}) is already being debugged, do you want to detach it?",
-                        "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question).Equals(MessageBoxResult.Yes)) {
-                        Debuggee = null;
-                        ManagedAppsVm.Repository.SosManager.AttachOrDetach(DebuggerBehavior.Detach, selected.Pid);
-                        RefreshManagedAppCommand_Handler(null);
-                    }
-                } else {
-                    if (Debuggee != null) // Let's detach before attaching newly selected process
-                        ManagedAppsVm.Repository.SosManager.AttachOrDetach(DebuggerBehavior.Detach, Debuggee.Pid);
-                    Debuggee = selected;
-                    ManagedAppsVm.Repository.SosManager.AttachOrDetach(DebuggerBehavior.Attach, selected.Pid);
-                }
-                Dispatcher.CurrentDispatcher.Invoke(() => Status.UpdateValues(ManagedAppsVm.Data.Count, Debuggee));
+		/// <summary>
+		/// Attaches the or detach debugging engine.
+		/// </summary>
+		/// <param name="selected">The selected.</param>
+		private void AttachOrDetachDebuggingEngine(ManagedApp selected) {
+			if (IsInitialized && selected != null) {
+				if (selected.Pid == Debuggee?.Pid) {
+					if (MessageBox.Show($"{selected.ImageName} (Pid:{selected.Pid}) is already being debugged, do you want to detach it?",
+						"Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question).Equals(MessageBoxResult.Yes)) {
+						Debuggee = null;
+						ManagedAppsVm.Repository.SosManager.AttachOrDetach(DebuggerBehavior.Detach, selected.Pid);
+						RefreshManagedAppCommand_Handler(null);
+					}
+				} else {
+					if (MessageBox.Show($"Do you want to attach debugger to {selected.ImageName} (Pid:{selected.Pid})?",
+							"Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question)
+						.Equals(MessageBoxResult.Yes)) {
+						if (Debuggee != null) // Let's detach before attaching newly selected process
+							ManagedAppsVm.Repository.SosManager.AttachOrDetach(DebuggerBehavior.Detach, Debuggee.Pid);
+						Debuggee = selected;
+						ManagedAppsVm.Repository.SosManager.AttachOrDetach(DebuggerBehavior.Attach, selected.Pid);
+					};
+				}
+				Dispatcher.CurrentDispatcher.Invoke(() => Status.UpdateValues(ManagedAppsVm.Data.Count, Debuggee));
 			}
-        }
+		}
 
-        /// <summary>
-        /// Updates the output window.
-        /// </summary>
-        /// <param name="message">The message.</param>
-        private void UpdateOutputWindow(string message) {
-            Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal, new Action(() => ManagedAppsVm.OutPut += message));
-        }
-    }
+		/// <summary>
+		/// Updates the output window.
+		/// </summary>
+		/// <param name="message">The message.</param>
+		private void UpdateOutputWindow(string message) {
+			Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal, new Action(() => ManagedAppsVm.OutPut += message));
+		}
+	}
 }

@@ -19,7 +19,7 @@
 		</ResourceDictionary>
 	</Window.Resources>
 	<Window.InputBindings>
-		<KeyBinding Command="{Binding RefreshManagedAppsCommand}" Key="F6"/>
+		<KeyBinding Command="{Binding RefreshManagedAppsCommand}" Key="F5"/>
 		<KeyBinding Command="{Binding AttachOrDetachCommand}" CommandParameter="{Binding ElementName=LstManagedProcesses, Path=SelectedItem}" Key="F9"/>
 	</Window.InputBindings>
 	<VisualStateManager.VisualStateGroups>
@@ -55,7 +55,7 @@
 			<ui:BindingProxy x:Key="Proxy" Data="{Binding}" />
 		</Grid.Resources>
 		<Menu VerticalAlignment="Top" Grid.Row="0">
-			<MenuItem Header="_Refresh" Command="{Binding RefreshManagedAppsCommand}" InputGestureText="F6"/>
+			<MenuItem Header="_Refresh (F5)" Command="{Binding RefreshManagedAppsCommand}" InputGestureText="F5"/>
 			<MenuItem Header="Commands...">
 				<MenuItem Header="Common Commands...">
 					<MenuItem Header="Call Stack for All Threads" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
@@ -112,17 +112,17 @@
 													  Path=DataContext.ManagedAppsVm.ViewUnManagedStackCommand}" CommandParameter="{Binding}" />
 				</MenuItem>
 			</MenuItem>
-			<MenuItem Header="_Attach/Detach" Command="{Binding AttachOrDetachCommand}" CommandParameter="{Binding ElementName=LstManagedProcesses, Path=SelectedItem}" InputGestureText="F9"/>
+			<MenuItem Header="_Attach/Detach (F9)" Command="{Binding AttachOrDetachCommand}" CommandParameter="{Binding ElementName=LstManagedProcesses, Path=SelectedItem}" InputGestureText="F9"/>
 		</Menu>
 		<TabControl HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" Grid.Row="1">
 			<TabItem Header="Workbench" >
-				<Grid>
+				<Grid  DataContext="{Binding ManagedAppsVm}">
 					<Grid.RowDefinitions>
 						<RowDefinition Height="40*"/>
 						<RowDefinition Height="auto"/>
 						<RowDefinition Height="5*"/>
 					</Grid.RowDefinitions>
-					<ScrollViewer  DataContext="{Binding ManagedAppsVm}" Grid.Row="0" Padding="7">
+					<ScrollViewer  Grid.Row="0" Padding="7">
 						<ListView Name="LstManagedProcesses" ItemsSource="{Binding Data}"  SelectedItem="{Binding DataFields}" d:ItemsSource="{d:SampleData ItemCount=5}">
 							<ListView.Resources>
 								<ContextMenu x:Key="ManagedAppContextMenu">
