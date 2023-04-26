@@ -10,7 +10,7 @@
 			 mc:Ignorable="d" 
 			 Title="Visual SOS"
 			 x:Name="MainContainer"     
-			 d:DesignHeight="300" d:DesignWidth="300"
+			 d:DesignHeight="476" d:DesignWidth="896"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              DataContext="{DynamicResource CombinedViewModel}">
 	<Window.Resources>
@@ -210,14 +210,33 @@
 							</ListView.View>
 						</ListView>
 					</ScrollViewer>
-					<StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Right" Margin="10, 25, 10, 10">
-						<ScrollViewer Height="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type StackPanel}}, Path=Height}">
-							<TextBox Width="400" Height="150" Text="{Binding Command}" TextWrapping="Wrap" AcceptsReturn="True"/>
+					<Grid Grid.Row="1">
+						<Grid.RowDefinitions>
+							<RowDefinition Height="*"/>
+							<RowDefinition Height="50"/>
+						</Grid.RowDefinitions>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*"/>
+							<ColumnDefinition Width="*"/>
+						</Grid.ColumnDefinitions>
+						<ScrollViewer Grid.Row="0" Grid.Column="0"  Height="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=Height}" Margin="50, 10, 50, -20">
+							<TextBox HorizontalAlignment="Stretch"  Height="150" Text="{Binding Notes}" TextWrapping="Wrap" AcceptsReturn="True"/>
 						</ScrollViewer>
-						<Button Content="Run Command" CommandParameter="{Binding Command}" Width="150" Height="50"
-													  Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
-													  Path=DataContext.RunSosCommand}" Margin="10, 10, 10, 10"/>
-					</StackPanel>
+						<DockPanel Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right">
+							<Button  Content="Open..." CommandParameter="{Binding Command}" Width="100" Height="35"
+							         Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Grid}, 
+													  Path= DataContext.OpenNoteFileCommand}" Margin="0, 30, 60, -20"/>
+							<Button   Content="Save" CommandParameter="{Binding Command}" Width="100" Height="35"
+							          Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Grid}, 
+													  Path=DataContext.SaveNoteFileCommand}" Margin="0, 30, 60, -20"/>
+						</DockPanel>
+						<ScrollViewer Grid.Row="0" Grid.Column="1"  Height="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=Height}" Margin="50, 10, 50, -20">
+							<TextBox Height="150" Text="{Binding Command}" TextWrapping="Wrap" AcceptsReturn="True"/>
+						</ScrollViewer>
+						<Button Grid.Row="1" Grid.Column="1" HorizontalAlignment="Right"  Content="Run Command" CommandParameter="{Binding Command}" Width="100" Height="35"
+						        Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, 
+													  Path=DataContext.RunSosCommand}" Margin="0, 30, 60, -20" />
+					</Grid>
 					<StatusBar Grid.Row="2" Height="35" Margin="0, 10, 0, -20">
 						<StatusBar.ItemsPanel>
 							<ItemsPanelTemplate>
@@ -227,6 +246,7 @@
 									</Grid.RowDefinitions>
 									<Grid.ColumnDefinitions>
 										<ColumnDefinition Width="300"/>
+										<ColumnDefinition Width="auto"/>
 										<ColumnDefinition Width="auto"/>
 										<ColumnDefinition Width="auto"/>
 									</Grid.ColumnDefinitions>
@@ -242,6 +262,9 @@
 						<StatusBarItem Grid.Column="2" HorizontalAlignment="Right">
 							<Label Name="lblDebuggerState" Content="{Binding Container.Status.DebuggerState}"  FontFamily="Courier, Consolas"/>
 						</StatusBarItem>
+						<StatusBarItem Grid.Column="3" HorizontalAlignment="Right">
+							<Label Name="lblNoteFile" Content="{Binding NoteFile}"  FontFamily="Courier, Consolas"/>
+						</StatusBarItem>
 					</StatusBar>
 				</Grid>
 			</TabItem>
@@ -255,7 +278,7 @@
 						</b:Interaction.Triggers>
 						<TextBox.ContextMenu>
 							<ContextMenu>
-								<MenuItem Header="Clear..." Command="{Binding Source={StaticResource Proxy}, Path=Data.ManagedAppsVm.ClearOutputCommand}"/>
+								<MenuItem Header="Clear..." Command="{Binding Source={StaticResource Proxy}, Path= Data.ManagedAppsVm.ClearOutputCommand}"/>
 								<MenuItem Header="Save Output..." Command="{Binding Source={StaticResource Proxy}, Path=Data.ManagedAppsVm.SaveOutputCommand}" />
 							</ContextMenu>
 						</TextBox.ContextMenu>

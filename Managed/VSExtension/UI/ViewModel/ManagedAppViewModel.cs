@@ -14,7 +14,9 @@ Website                 : http://www.angelhernandezm.com
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -24,6 +26,8 @@ using VisualSOS.Common;
 using VisualSOS.Core.Commands;
 using VisualSOS.Core.Model;
 using VisualSOS.Core.ViewModels;
+using System.Windows.Threading;
+using System.Runtime.InteropServices.ComTypes;
 
 namespace VisualSOS.UI.ViewModel {
     /// <summary>
@@ -31,12 +35,7 @@ namespace VisualSOS.UI.ViewModel {
     /// </summary>
     /// <seealso cref="ManagedApp" />
     public class ManagedAppViewModel : ViewModelBase<ManagedApp, IManagedAppRepository<ManagedApp>> {
-        /// <summary>
-        /// The commands
-        /// </summary>
-        private Stack<string> _commands;
-
-        /// <summary>
+	    /// <summary>
         /// The command
         /// </summary>
         private string _command;
@@ -45,6 +44,16 @@ namespace VisualSOS.UI.ViewModel {
         /// The output
         /// </summary>
         private string _output;
+
+		/// <summary>
+		/// The notes
+		/// </summary>
+		private string _notes;
+
+		/// <summary>
+		/// The note file
+		/// </summary>
+		private string _noteFile;
 
         /// <summary>
         /// Gets or sets the out put.
@@ -75,28 +84,40 @@ namespace VisualSOS.UI.ViewModel {
             }
         }
 
-        /// <summary>
-        /// Gets or sets the commands.
-        /// </summary>
-        /// <value>
-        /// The commands.
-        /// </value>
-        public Stack<string> Commands {
-            get => _commands;
+		/// <summary>
+		/// Gets or sets the notes.
+		/// </summary>
+		/// <value>The notes.</value>
+		public string Notes {
+	        get => _notes;
 
-            set {
-                _commands = value;
-                RaisePropertyChanged("Commands");
-            }
-        }
+	        set {
+		        _notes = value;
+		        RaisePropertyChanged("Notes");
+	        }
+		}
 
-        /// <summary>
-        /// Gets or sets the container.
-        /// </summary>
-        /// <value>
-        /// The container.
-        /// </value>
-        public CombinedViewModel Container {
+		/// <summary>
+		/// Gets or sets the note file.
+		/// </summary>
+		/// <value>The note file.</value>
+		public string NoteFile {
+			get => _noteFile;
+
+			set {
+				_noteFile = value;
+				RaisePropertyChanged("NoteFile");
+			}
+		}
+
+
+		/// <summary>
+		/// Gets or sets the container.
+		/// </summary>
+		/// <value>
+		/// The container.
+		/// </value>
+		public CombinedViewModel Container {
             get; set;
         }
 
@@ -371,12 +392,28 @@ namespace VisualSOS.UI.ViewModel {
             get; set;
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ManagedAppViewModel"/> class.
-        /// </summary>
-        public ManagedAppViewModel() {
-            _commands = new Stack<string>();
-            ListLoadedModulesCommand = new CommandBase(ListLoadedModulesCommand_Handler);
+		/// <summary>
+		/// Gets or sets the save note file command.
+		/// </summary>
+		/// <value>The save note file command.</value>
+		public CommandBase SaveNoteFileCommand {
+	        get; set;
+        }
+        
+		/// <summary>
+		/// Gets or sets the open note file command.
+		/// </summary>
+		/// <value>The open note file command.</value>
+		public CommandBase OpenNoteFileCommand {
+	        get; set;
+        }
+
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ManagedAppViewModel"/> class.
+		/// </summary>
+		public ManagedAppViewModel() {
+			ListLoadedModulesCommand = new CommandBase(ListLoadedModulesCommand_Handler);
             ViewCombinedStackCommand = new CommandBase(ViewCombinedStackCommand_Handler);
             ViewUnManagedStackCommand = new CommandBase(ViewUnManagedStackCommand_Handler);
             ViewCpuConsumptionCommand = new CommandBase(ViewCpuConsumptionCommand_Handler);
@@ -403,7 +440,11 @@ namespace VisualSOS.UI.ViewModel {
             ShowAllLocksCommand = new CommandBase(ShowAllLocksCommand_Handler);
             ClearOutputCommand = new CommandBase(ClearOutputCommand_Handler);
             SaveOutputCommand = new CommandBase(SaveOutputCommand_Handler);
-        }
+            OpenNoteFileCommand = new CommandBase(OpenNoteFileCommand_Handler);
+            SaveNoteFileCommand = new CommandBase(SaveNoteFileCommand_Handler);
+            NoteFile = GetDefaultNoteFilePath();
+            Task.Run(async () => await OpenFile(NoteFile));
+		}
 
         /// <summary>
         /// Views the managed threads command handler.
@@ -413,24 +454,98 @@ namespace VisualSOS.UI.ViewModel {
             SendCommandToSos(SosCommand.ListManagedThreads);
         }
 
-        /// <summary>
-        /// Clears the output command handler.
-        /// </summary>
-        /// <param name="sender">The sender.</param>
-        private void ClearOutputCommand_Handler(object sender) {
-            if (Container.IsDebugging) {
-                Repository.SosManager.RunCommand("!HistClear", true);
-                Repository.SosManager.RunCommand("!SOSFlush", true);
-            }
-            OutPut = string.Empty;
-            GC.Collect();
-        }
+		/// <summary>
+		/// Opens the note file command handler.
+		/// </summary>
+		/// <param name="sender">The sender.</param>
+		private async void OpenNoteFileCommand_Handler(object sender) {
+			Exception ex = null;
+            
+			await this.SafelyRunCallback(async () => {
+				var opeFileDlg = new OpenFileDialog { AddExtension = true, DefaultExt = "*.txt", CheckFileExists = true };
 
-        /// <summary>
-        /// Saves the output command handler.
-        /// </summary>
-        /// <param name="sender">The sender.</param>
-        private void SaveOutputCommand_Handler(object sender) {
+				if (opeFileDlg.ShowDialog((Window)Instance).Value && !string.IsNullOrEmpty(opeFileDlg.FileName)) {
+					using (var stream = opeFileDlg.OpenFile()) {
+                        await OpenFile(stream, opeFileDlg.FileName);
+					}
+				}
+
+			}, out ex);
+
+			if (ex != null)
+				MessageBox.Show($"Unable to open Notes' file due to {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+		}
+
+		/// <summary>
+		/// Saves the note file command handler.
+		/// </summary>
+		/// <param name="sender">The sender.</param>
+		private void SaveNoteFileCommand_Handler(object sender) {
+			Exception ex = null;
+
+			this.SafelyRunCallback(async () => {
+				if (File.Exists(NoteFile)) {
+					File.AppendAllText(NoteFile, Notes);
+				} else {
+					using (var sw = File.AppendText(NoteFile))
+						await sw.WriteAsync(Notes);
+				}
+			}, out ex);
+		}
+
+		/// <summary>
+		/// Opens the file.
+		/// </summary>
+		/// <param name="t">The t.</param>
+		/// <param name="filePath">The file path.</param>
+		private async Task OpenFile(object t, string filePath = "") {
+			Exception ex = null;
+			byte[] buffer = null;
+
+			await this.SafelyRunCallback(async () => {
+				if (t?.GetType() == typeof(string)) {
+					if (File.Exists(t.ToString())) {
+						NoteFile = t.ToString();
+						Notes = File.ReadAllText(t.ToString());
+						Dispatcher.CurrentDispatcher.Invoke(() => Container.Status.UpdateValues(Data.Count, Container.Debuggee));
+					}
+				} else if (t?.GetType() == typeof(FileStream)) {
+					buffer = new byte[((Stream)t).Length];
+					await ((Stream)t)?.ReadAsync(buffer, 0, buffer.Length);
+					NoteFile = filePath;
+					Notes = Encoding.UTF8.GetString(buffer);
+					Dispatcher.CurrentDispatcher.Invoke(() => Container.Status.UpdateValues(Data.Count, Container.Debuggee));
+				}
+			}, out ex);
+
+		}
+
+		/// <summary>
+		/// Gets the default note file path.
+		/// </summary>
+		/// <returns>System.String.</returns>
+		private string GetDefaultNoteFilePath() {
+			return $@"{Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}\VisualSosNotes.txt";  
+		}
+
+		/// <summary>
+		/// Clears the output command handler.
+		/// </summary>
+		/// <param name="sender">The sender.</param>
+		private void ClearOutputCommand_Handler(object sender) {
+			if (Container.IsDebugging) {
+				Repository.SosManager.RunCommand("!HistClear", true);
+				Repository.SosManager.RunCommand("!SOSFlush", true);
+			}
+			OutPut = string.Empty;
+			GC.Collect();
+		}
+
+		/// <summary>
+		/// Saves the output command handler.
+		/// </summary>
+		/// <param name="sender">The sender.</param>
+		private void SaveOutputCommand_Handler(object sender) {
             SaveFileDialog saveDlg;
 
             if (Container.IsDebugging && !string.IsNullOrEmpty(OutPut)) {

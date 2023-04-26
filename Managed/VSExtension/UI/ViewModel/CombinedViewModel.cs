@@ -93,7 +93,7 @@ namespace VisualSOS.UI.ViewModel {
         /// <value>
         /// The debuggee.
         /// </value>
-        private ManagedApp Debuggee {
+        public ManagedApp Debuggee {
             get; set;
         }
 
